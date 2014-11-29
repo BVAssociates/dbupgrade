@@ -7,7 +7,7 @@ class VersionException(Exception):
     pass
 
 
-class Version(object):
+class StepVersion(object):
     """
     Manage version numbering
     """
@@ -16,13 +16,21 @@ class Version(object):
         self.version_string = version_string
         self.module_name = module_name
 
-    def __cmp__(self, other):
-        if self.module_name != other.module_name:
-            raise VersionException
-        return cmp(self.version_string, other.version_string)
+        try:
+            self.version_internal = map(int, (self.version_string.split('.')))
+        except ValueError:
+            raise VersionException("Invalid version format %s" % self.version_string)
+
+        if len(self.version_internal) > 6:
+            raise VersionException("Invalid version format %s" % self.version_string)
+
+        self.version_internal = tuple(self.version_internal + [0] * (6 - len(self.version_internal)))
+
+    def __eq__(self, other):
+        return self.version_internal == other.version_internal
 
     def __repr__(self):
-        return "%s.%s" % (self.module_name, self.version_string)
+        return "%s.%s" % (self.module_name, '.'.join(map(str, self.version_internal)))
 
 
 class FileRepository(object):
@@ -59,7 +67,8 @@ class FileRepository(object):
 
     def read_versions(self, module_name):
         for version_string in os.listdir(os.path.join(self.repository_path, module_name)):
-            self.versions.append(Version(version_string, module_name))
-        self.versions.sort()
+            self.versions.append(StepVersion(version_string, module_name))
+        self.versions.sort(key=lambda ver: ver.version_internal)
+
 
 

@@ -1,4 +1,4 @@
-from dbupgrade.repository.version import FileRepository, Version
+from dbupgrade.repository.version import FileRepository, StepVersion
 
 __author__ = 'vincent'
 
@@ -15,14 +15,14 @@ class FileRepositoryCase(unittest.TestCase):
 
     def test_list_versions(self):
         tested_app = 'app2'
+        assert_versions = [
+            StepVersion('4.0.1', tested_app),
+            StepVersion('4.0.1.2', tested_app),
+            StepVersion('4.5.0', tested_app),
+            StepVersion('4.10.0', tested_app),
+        ]
         versions = self.repo.list_versions(tested_app)
 
-        assert_versions = [
-            Version('4.0.1', tested_app),
-            Version('4.0.1-2', tested_app),
-            Version('4.5.0', tested_app),
-            Version('4.10.0', tested_app),
-        ]
         self.assertEqual(assert_versions, versions)
 
 
