@@ -1,4 +1,5 @@
-from dbupgrade.repository.version import FileRepository, StepVersion
+from dbupgrade.repository.file_repository import FileRepository, RepositoryException
+from dbupgrade.version import StepVersion
 
 __author__ = 'vincent'
 
@@ -7,23 +8,95 @@ import unittest
 
 class FileRepositoryCase(unittest.TestCase):
     def setUp(self):
-        self.repo = FileRepository('test/repository')
+        self.repo = FileRepository('test/repository', 'app2')
 
     def test_list_applications(self):
-        apps = self.repo.list_modules()
+        apps = FileRepository.list_modules('test/repository')
         self.assertEqual(['app1', 'app2'], apps)
 
     def test_list_versions(self):
-        tested_app = 'app2'
         assert_versions = [
-            StepVersion('4.0.1', tested_app),
-            StepVersion('4.0.1.2', tested_app),
-            StepVersion('4.5.0', tested_app),
-            StepVersion('4.10.0', tested_app),
+            StepVersion('4.0.1'),
+            StepVersion('4.0.1.2'),
+            StepVersion('4.5.0'),
+            StepVersion('4.10.0'),
         ]
-        versions = self.repo.list_versions(tested_app)
+        versions = self.repo.list_versions()
 
-        self.assertEqual(assert_versions, versions)
+        self.assertEqual(versions, assert_versions)
+
+    def test_path_to_version(self):
+        with self.assertRaises(RepositoryException):
+            self.repo.path_to_version(version_from=StepVersion('7.0.0'))
+
+        with self.assertRaises(RepositoryException):
+            self.repo.path_to_version(version_to=StepVersion('7.0.0'))
+
+        self.assertEqual(
+            self.repo.path_to_version(version_from=StepVersion('4.5.0'), version_to=StepVersion('4.5.0')),
+            []
+        )
+
+        versions = [
+            StepVersion('4.0.1'),
+            StepVersion('4.0.1.2'),
+            StepVersion('4.5.0'),
+            StepVersion('4.10.0'),
+        ]
+
+        self.assertEqual(
+            self.repo.path_to_version(),
+            [
+                StepVersion('4.0.1'),
+                StepVersion('4.0.1.2'),
+                StepVersion('4.5.0'),
+                StepVersion('4.10.0'),
+            ]
+        )
+
+
+        # Upgrade
+        self.assertEqual(
+            self.repo.path_to_version(version_to=StepVersion('4.5.0')),
+            [
+                StepVersion('4.0.1'),
+                StepVersion('4.0.1.2'),
+                StepVersion('4.5.0'),
+            ]
+        )
+
+        self.assertEqual(
+            self.repo.path_to_version(version_from=StepVersion('4.0.1.2')),
+            [
+                StepVersion('4.5.0'),
+                StepVersion('4.10.0'),
+            ]
+        )
+
+        self.assertEqual(
+            self.repo.path_to_version(version_from=StepVersion('4.0.1.2'), version_to=StepVersion('4.5.0')),
+            [
+                StepVersion('4.5.0'),
+            ]
+        )
+
+        # Downgrade
+        self.assertEqual(
+            self.repo.path_to_version(version_from=StepVersion('4.5.0'), version_to=StepVersion('4.0.1.2')),
+            [
+                StepVersion('4.5.0'),
+            ]
+        )
+
+        self.assertEqual(
+            self.repo.path_to_version(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1')),
+            [
+                StepVersion('4.10.0'),
+                StepVersion('4.5.0'),
+                StepVersion('4.0.1.2'),
+
+            ]
+        )
 
 
 if __name__ == '__main__':

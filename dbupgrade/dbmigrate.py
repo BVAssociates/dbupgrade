@@ -1,4 +1,4 @@
-from dbupgrade.repository.version import FileRepository
+from dbupgrade.repository.file_repository import FileRepository
 
 __author__ = 'vincent'
 
