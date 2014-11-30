@@ -21,12 +21,10 @@ class FileRepository(object):
         self.versions = []
         module_path = os.path.join(self.repository_path, self.module)
         for version_string in os.listdir(module_path):
-            version_path = os.path.join(module_path, version_string)
             current_version = StepVersion(version_string)
             self.versions.append(current_version)
 
         self.versions.sort()
-
 
     @staticmethod
     def list_modules(repository_path):
@@ -44,8 +42,7 @@ class FileRepository(object):
         """
         List of available versions in repository
 
-        :param module_name:
-        :return list:
+         :return list:
         """
 
         return self.versions
@@ -81,7 +78,7 @@ class FileRepository(object):
 
         for step in self.versions:
 
-            if step > version_from and step <= version_to:
+            if version_from < step <= version_to:
                 versions_path.append(step)
 
         if downgrade:
@@ -94,7 +91,6 @@ class FileRepository(object):
         Read filesystem and return
 
         :type version_from: object
-        :param module_name:
         :return:
         """
 
@@ -102,12 +98,10 @@ class FileRepository(object):
         for step in self.list_versions():
             pass
 
-
     def _fs_readfile(self, module_version, pattern):
         """
         return the content of the specified file
 
-        :param module_name:
         :param module_version:
         :param pattern:
         :return string:
@@ -117,15 +111,15 @@ class FileRepository(object):
 
         found_files = []
         for step_file in os.listdir(version_path):
-            if re.match('^%s' % pattern, file):
+            if re.match('^%s' % pattern, step_file):
                 found_files.append(step_file)
 
         if len(found_files) != 1:
             raise RepositoryException
 
-        file = open(found_files[0])
-        content = file.readall()
-        file.close()
+        repo_file = open(found_files[0])
+        content = repo_file.readall()
+        repo_file.close()
 
         return content
 

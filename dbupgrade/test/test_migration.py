@@ -37,13 +37,6 @@ class FileRepositoryCase(unittest.TestCase):
             []
         )
 
-        versions = [
-            StepVersion('4.0.1'),
-            StepVersion('4.0.1.2'),
-            StepVersion('4.5.0'),
-            StepVersion('4.10.0'),
-        ]
-
         self.assertEqual(
             self.repo.path_to_version(),
             [
@@ -53,7 +46,6 @@ class FileRepositoryCase(unittest.TestCase):
                 StepVersion('4.10.0'),
             ]
         )
-
 
         # Upgrade
         self.assertEqual(

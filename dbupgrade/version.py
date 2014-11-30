@@ -22,7 +22,9 @@ class StepVersion(object):
             raise VersionException("Invalid version format %s" % self.version_string)
 
         # left fill with 0
-        self.version_internal = tuple(self.version_internal + [0] * (6 - len(self.version_internal)))
+        self.version_internal = tuple(
+            tuple(self.version_internal) + tuple([0] * (6 - len(self.version_internal)))
+        )
 
     def __repr__(self):
         return self.version_string
