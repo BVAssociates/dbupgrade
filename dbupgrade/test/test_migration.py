@@ -1,5 +1,6 @@
 from dbupgrade.repository.file_repository import FileRepository, RepositoryException
 from dbupgrade.version import StepVersion
+import os
 
 __author__ = 'vincent'
 
@@ -8,10 +9,10 @@ import unittest
 
 class FileRepositoryCase(unittest.TestCase):
     def setUp(self):
-        self.repo = FileRepository('test/repository', 'app2')
+        self.repo = FileRepository('repository', 'app2')
 
     def test_list_applications(self):
-        apps = FileRepository.list_modules('test/repository')
+        apps = FileRepository.list_modules('repository')
         self.assertEqual(['app1', 'app2'], apps)
 
     def test_list_versions(self):

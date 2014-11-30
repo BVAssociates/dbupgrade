@@ -1,4 +1,1 @@
-CREATE TABLE test_first (
-    INTEGER a,
-    VARCHAR b
-    )
+ALTER TABLE testfirst ADD COLUMN INTEGER C;
