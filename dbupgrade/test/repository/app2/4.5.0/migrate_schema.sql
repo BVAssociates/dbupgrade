@@ -1,4 +1,1 @@
-CREATE TABLE test_second (
-    INTEGER a,
-    VARCHAR b
-    )
+CREATE TABLE test_second (INTEGER a,VARCHAR b);

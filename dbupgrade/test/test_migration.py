@@ -91,6 +91,28 @@ class FileRepositoryCase(unittest.TestCase):
             ]
         )
 
+    def test_get_migration(self):
+
+        # Upgrade
+        self.assertEquals(
+            self.repo.get_migration(version_from=StepVersion('4.0.1'), version_to=StepVersion('4.10.0')),
+            [
+                'CREATE TABLE test_first (INTEGER a,VARCHAR b);',
+                'CREATE TABLE test_second (INTEGER a,VARCHAR b);',
+                'ALTER TABLE testfirst ADD COLUMN INTEGER C;',
+            ]
+        )
+
+        # Downgrade
+        self.assertEquals(
+            self.repo.get_migration(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1')),
+            [
+                'ALTER TABLE testfirst DROP COLUMN C;',
+                'DROP TABLE test_second;',
+                'DROP TABLE test_first;',
+            ]
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

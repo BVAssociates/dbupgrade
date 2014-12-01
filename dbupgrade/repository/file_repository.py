@@ -94,11 +94,21 @@ class FileRepository(object):
         :return:
         """
 
-        migration_steps = []
-        for step in self.list_versions():
-            pass
+        migration_steps = self.path_to_version(version_from,version_to)
 
-    def _fs_readfile(self, module_version, pattern):
+        # TODO: pattern from configuration
+        pattern='^migrate_'
+        if migration_steps[0] > migration_steps[-1]:
+            pattern='^undo_'
+
+        content_list=[]
+        for step in migration_steps:
+            step_content=self.read_file(step.version_string, pattern)
+            content_list.append(step_content)
+
+        return content_list
+
+    def read_file(self, module_version, pattern):
         """
         return the content of the specified file
 
@@ -111,15 +121,19 @@ class FileRepository(object):
 
         found_files = []
         for step_file in os.listdir(version_path):
-            if re.match('^%s' % pattern, step_file):
+            if re.match('%s' % pattern, step_file):
                 found_files.append(step_file)
 
         if len(found_files) != 1:
             raise RepositoryException
 
-        repo_file = open(found_files[0])
-        content = repo_file.readall()
-        repo_file.close()
+        # Slurp
+        try:
+            repo_file = open(os.path.join(version_path,found_files[0]))
+            content = repo_file.read()
+            repo_file.close()
+        except IOError, e:
+            raise RepositoryException('Unable to read file from repository : %s'%e)
 
         return content
 
