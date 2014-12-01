@@ -1,7 +1,7 @@
 import os
 import re
 
-from dbupgrade.version import StepVersion
+from dbupgrade.common import StepVersion, Migration
 
 
 __author__ = 'vincent'
@@ -91,7 +91,7 @@ class FileRepository(object):
         Read filesystem and return
 
         :type version_from: object
-        :return:
+        :return hash:
         """
 
         migration_steps = self.path_to_version(version_from,version_to)
@@ -101,12 +101,11 @@ class FileRepository(object):
         if migration_steps[0] > migration_steps[-1]:
             pattern='^undo_'
 
-        content_list=[]
+        result = Migration()
         for step in migration_steps:
-            step_content=self.read_file(step.version_string, pattern)
-            content_list.append(step_content)
+            result[step] = self.read_file(step.version_string, pattern)
 
-        return content_list
+        return result
 
     def read_file(self, module_version, pattern):
         """

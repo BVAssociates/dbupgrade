@@ -1,6 +1,5 @@
 from dbupgrade.repository.file_repository import FileRepository, RepositoryException
-from dbupgrade.version import StepVersion
-import os
+from dbupgrade.common import StepVersion
 
 __author__ = 'vincent'
 
@@ -94,23 +93,18 @@ class FileRepositoryCase(unittest.TestCase):
     def test_get_migration(self):
 
         # Upgrade
-        self.assertEquals(
-            self.repo.get_migration(version_from=StepVersion('4.0.1'), version_to=StepVersion('4.10.0')),
-            [
-                'CREATE TABLE test_first (INTEGER a,VARCHAR b);',
-                'CREATE TABLE test_second (INTEGER a,VARCHAR b);',
-                'ALTER TABLE testfirst ADD COLUMN INTEGER C;',
-            ]
-        )
+
+        migration_result = self.repo.get_migration(version_from=StepVersion('4.0.1'), version_to=StepVersion('4.10.0'))
+        self.assertEquals(migration_result[StepVersion('4.0.1.2')], 'CREATE TABLE test_first (INTEGER a,VARCHAR b);')
 
         # Downgrade
         self.assertEquals(
             self.repo.get_migration(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1')),
-            [
-                'ALTER TABLE testfirst DROP COLUMN C;',
-                'DROP TABLE test_second;',
-                'DROP TABLE test_first;',
-            ]
+            {
+                StepVersion('4.10.0'): 'ALTER TABLE testfirst DROP COLUMN C;',
+                StepVersion('4.5.0'): 'DROP TABLE test_second;',
+                StepVersion('4.0.1.2'): 'DROP TABLE test_first;',
+            }
         )
 
 
