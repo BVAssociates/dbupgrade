@@ -7,11 +7,13 @@ class StepVersion(object):
     Manage version numbering.
     """
 
-    def __init__(self, version_string):
-        self.version_string = version_string
+    def __init__(self, version_string, module=None, content=None):
+        self._version_string = version_string
+        self._content = content
+        self._module = module
 
-        if self.version_string == 'Infinite':
-            self.version_string = '999.999.999'
+        if self._version_string == 'Infinite':
+            self._version_string = '999.999.999'
 
         try:
             self.version_internal = map(int, (self.version_string.split('.')))
@@ -31,6 +33,24 @@ class StepVersion(object):
             tuple(self.version_internal) + tuple([0] * (6 - len(self.version_internal)))
         )
 
+    # Properties
+    @property
+    def content(self):
+        return self._content
+
+    @content.setter
+    def content(self, content):
+        self._content = content
+
+    @property
+    def version_string(self):
+        return self._version_string
+
+    @property
+    def module(self):
+        return self._module
+
+    # For debugging purpose
     def __repr__(self):
         return self.version_string
 
