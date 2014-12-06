@@ -1,0 +1,1 @@
+ALTER TABLE testfirst DROP COLUMN C;
