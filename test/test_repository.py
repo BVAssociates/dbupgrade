@@ -11,7 +11,7 @@ class FileRepositoryCase(unittest.TestCase):
         self.repo = FileRepository('repository', 'app2')
 
     def test_list_applications(self):
-        apps = FileRepository.list_modules('repository')
+        apps = FileRepository.list_applications('repository')
         self.assertEqual(['app1', 'app2'], apps)
 
     def test_list_versions(self):
@@ -93,17 +93,23 @@ class FileRepositoryCase(unittest.TestCase):
     def test_get_migration(self):
         # Upgrade
 
-        migration_result = self.repo.get_migration(version_from=StepVersion('4.0.1'), version_to=StepVersion('4.10.0'))
-        self.assertEquals(migration_result[StepVersion('4.0.1.2')], 'CREATE TABLE test_first (INTEGER a,VARCHAR b);')
+        steps = self.repo.get_migration(version_from=StepVersion('4.0.1'), version_to=StepVersion('4.10.0'))
+        self.assertEquals(steps.content_steps(),
+                          (
+                              'CREATE TABLE test_first (INTEGER a,VARCHAR b);',
+                              'CREATE TABLE test_second (INTEGER a,VARCHAR b);',
+                              'ALTER TABLE testfirst ADD COLUMN INTEGER C;',
+                          )
+        )
 
         # Downgrade
-        self.assertEquals(
-            self.repo.get_migration(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1')),
-            {
-                StepVersion('4.10.0'): 'ALTER TABLE testfirst DROP COLUMN C;',
-                StepVersion('4.5.0'): 'DROP TABLE test_second;',
-                StepVersion('4.0.1.2'): 'DROP TABLE test_first;',
-            }
+        steps = self.repo.get_migration(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1'))
+        self.assertEquals(steps.content_steps(),
+                          (
+                              'ALTER TABLE testfirst DROP COLUMN C;',
+                              'DROP TABLE test_second;',
+                              'DROP TABLE test_first;',
+                          )
         )
 
 

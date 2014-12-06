@@ -27,42 +27,35 @@ class StepVersionCase(unittest.TestCase):
         version.content = another_sample_string
         self.assertEqual(version.content, another_sample_string)
 
-    def test_module(self):
-        sample_module = "module1"
-        version = StepVersion('0.0.1', module=sample_module)
-        self.assertEqual(version.module, sample_module)
-
-        # read-only property
-        with self.assertRaises(AttributeError):
-            version.module = 'fail'
-
-
 class MigrationCase(unittest.TestCase):
     def test_exception(self):
-        migration = Migration()
+        migration = Migration('myApp')
+        version_one = StepVersion('4.0.1', 'one')
 
         with self.assertRaises(MigrationException):
-            migration['toto'] = 'something'
+            migration.append_step('toto')
         with self.assertRaises(MigrationException):
-            migration[StepVersion('4.0.1')] = 999
-        with self.assertRaises(MigrationException):
-            migration[StepVersion('4.0.1')] = 'one'
-            migration[StepVersion('4.0.1')] = 'one'
+            migration.append_step(version_one)
+            migration.append_step(version_one)
 
     def test_order(self):
-        assert_migration = {
-            StepVersion('4.0.1'): 'one',
-            StepVersion('4.0.1.2'): 'two',
-            StepVersion('4.5.0'): 'three',
-        }
+        version_one = StepVersion('4.0.1', 'one')
+        version_two = StepVersion('4.0.1.2', 'two')
+        version_three = StepVersion('4.5.0', 'three')
 
-        migration = Migration()
-        migration[StepVersion('4.0.1')] = 'one'
-        migration[StepVersion('4.0.1.2')] = 'two'
-        migration[StepVersion('4.5.0')] = 'three'
+        assert_migration = [
+            StepVersion('4.0.1'),
+            StepVersion('4.0.1.2'),
+            StepVersion('4.5.0'),
+        ]
+
+        migration = Migration('myApp')
+        migration.append_step(version_one)
+        migration.append_step(version_two)
+        migration.append_step(version_three)
 
         # assert keys are still sorted
-        self.assertEqual(sorted(assert_migration.keys()), migration.keys())
+        self.assertEqual(migration.steps, sorted(assert_migration))
 
 
 if __name__ == '__main__':

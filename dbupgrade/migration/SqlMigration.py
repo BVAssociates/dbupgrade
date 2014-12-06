@@ -1,9 +1,10 @@
-from dbupgrade.common import Migration
-
 __author__ = 'vincent'
 
 
 class BaseMigration(object):
+    def __init__(self, migration=None):
+        self.migration = migration
+
     def initialize(self):
         """
         This method setup
@@ -18,33 +19,32 @@ class BaseMigration(object):
         """
         return ''
 
-    def run_migration(self, migration):
+    def run_migration(self):
         """
         This is the main method
         Run all the migrations steps
         :param migration: Migration
         :return: str
         """
-        assert isinstance(migration, Migration)
 
         result_string = ''
 
         result_string += self.begin()
 
-        for step_version in migration:
-            result_string += self.single_migration(migration[step_version])
+        for step_version in self.migration.steps:
+            result_string += self.single_migration(step_version)
 
         result_string += self.end()
 
         return result_string
 
-    def single_migration(self, text):
+    def single_migration(self, version):
         """
         Run a single migration step
         :param text: str
         :return:
         """
-        return text + "\n"
+        return version.content + "\n"
 
     def begin(self):
         """
@@ -92,7 +92,7 @@ class SqlMigration(BaseMigration):
         return 'COMMIT;' + "\n"
 
     def set_version(self, version):
-        return 'INSERT INTO public.dbupgrade_history SET (schema,version) VALUES (\'%s\',\'%s\');' % ('tata', 'titi')
+        return 'INSERT INTO public.dbupgrade_history SET (schema,version) VALUES (\'%s\',\'%s\');' % ()
 
 
 class MigrationNotInitialized(Exception):

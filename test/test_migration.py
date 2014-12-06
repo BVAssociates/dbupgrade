@@ -9,14 +9,14 @@ import unittest
 
 class BaseMigrationCase(unittest.TestCase):
     def setUp(self):
-        self.simple_migration = BaseMigration()
+        self.migration = BaseMigration()
 
     def test_run_migration_upgrade(self):
         sample_repo = FileRepository('repository', 'app2')
-        sample_migration = sample_repo.get_migration(version_from=StepVersion('4.0.1'),
+        self.migration.migration = sample_repo.get_migration(version_from=StepVersion('4.0.1'),
                                                      version_to=StepVersion('4.10.0'))
 
-        result = self.simple_migration.run_migration(sample_migration)
+        result = self.migration.run_migration()
         self.assertEqual(
             result,
             ("CREATE TABLE test_first (INTEGER a,VARCHAR b);\n"
@@ -27,9 +27,10 @@ class BaseMigrationCase(unittest.TestCase):
 
     def test_run_migration_downgrade(self):
         repo = FileRepository('repository', 'app2')
-        sample_migration = repo.get_migration(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1'))
+        self.migration.migration = repo.get_migration(version_from=StepVersion('4.10.0'),
+                                                      version_to=StepVersion('4.0.1'))
 
-        result = self.simple_migration.run_migration(sample_migration)
+        result = self.migration.run_migration()
         self.assertEqual(
             result,
             ("ALTER TABLE testfirst DROP COLUMN C;\n"

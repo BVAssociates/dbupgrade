@@ -1,16 +1,14 @@
 __author__ = 'vincent'
 
-from collections import OrderedDict
 
 class StepVersion(object):
     """
     Manage version numbering.
     """
 
-    def __init__(self, version_string, module=None, content=None):
+    def __init__(self, version_string, content=None):
         self._version_string = version_string
         self._content = content
-        self._module = module
 
         if self._version_string == 'Infinite':
             self._version_string = '999.999.999'
@@ -46,10 +44,6 @@ class StepVersion(object):
     def version_string(self):
         return self._version_string
 
-    @property
-    def module(self):
-        return self._module
-
     # For debugging purpose
     def __repr__(self):
         return self.version_string
@@ -84,26 +78,38 @@ class StepVersion(object):
         return self.version_internal <= other.version_internal
 
 
-class Migration(OrderedDict):
+class Migration(object):
     """
     Manage a set of migration
     """
 
-    def __setitem__(self, version, content):
+    def __init__(self, application, version_list=None):
+        self._application = str(application)
+        self._steps = []
 
-        # hardened type
+        if version_list:
+            for version in version_list:
+                self.append_step(version)
+
+    def append_step(self, version):
+        # error on duplicate
+        if version in self.steps:
+            raise MigrationException
+
         if not isinstance(version, StepVersion):
             raise MigrationException
-        if not isinstance(content, str):
-            raise MigrationException
+        self.steps.append(version)
 
-        # error on duplicate
-        for k in self.keys():
-            if k == version:
-                raise MigrationException
+    @property
+    def steps(self):
+        return self._steps
 
-        super(Migration, self).__setitem__(version, content)
+    def content_steps(self):
+        return tuple(step.content for step in self.steps)
 
+    @property
+    def application(self):
+        return self._application
 
 class MigrationException(Exception):
     pass
