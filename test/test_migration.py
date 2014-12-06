@@ -1,5 +1,5 @@
 from dbupgrade.common import StepVersion
-from dbupgrade.migration.SqlMigration import SqlMigration, BaseMigration
+from dbupgrade.migration.SqlMigration import SqlUpdater, BaseUpdater
 from dbupgrade.repository.file_repository import FileRepository
 
 __author__ = 'Vincent'
@@ -7,16 +7,16 @@ __author__ = 'Vincent'
 import unittest
 
 
-class BaseMigrationCase(unittest.TestCase):
+class BaseUpdaterCase(unittest.TestCase):
     def setUp(self):
-        self.migration = BaseMigration()
+        self.updater = BaseUpdater()
 
     def test_run_migration_upgrade(self):
         sample_repo = FileRepository('repository', 'app2')
-        self.migration.migration = sample_repo.get_migration(version_from=StepVersion('4.0.1'),
+        self.updater.migration = sample_repo.get_migration(version_from=StepVersion('4.0.1'),
                                                      version_to=StepVersion('4.10.0'))
 
-        result = self.migration.run_migration()
+        result = self.updater.run_migration()
         self.assertEqual(
             result,
             ("CREATE TABLE test_first (INTEGER a,VARCHAR b);\n"
@@ -27,10 +27,10 @@ class BaseMigrationCase(unittest.TestCase):
 
     def test_run_migration_downgrade(self):
         repo = FileRepository('repository', 'app2')
-        self.migration.migration = repo.get_migration(version_from=StepVersion('4.10.0'),
+        self.updater.migration = repo.get_migration(version_from=StepVersion('4.10.0'),
                                                       version_to=StepVersion('4.0.1'))
 
-        result = self.migration.run_migration()
+        result = self.updater.run_migration()
         self.assertEqual(
             result,
             ("ALTER TABLE testfirst DROP COLUMN C;\n"
@@ -40,9 +40,9 @@ class BaseMigrationCase(unittest.TestCase):
         )
 
 
-class SqlMigrationCase(unittest.TestCase):
+class SqlUpdaterCase(unittest.TestCase):
     def setUp(self):
-        self.sqlmigration = SqlMigration()
+        self.sqlmigration = SqlUpdater()
 
     def test_initialize(self):
         self.assertEqual(

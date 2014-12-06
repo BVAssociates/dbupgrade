@@ -1,7 +1,7 @@
 __author__ = 'vincent'
 
 
-class BaseMigration(object):
+class BaseUpdater(object):
     def __init__(self, migration=None):
         self.migration = migration
 
@@ -61,7 +61,7 @@ class BaseMigration(object):
         return ''
 
 
-class SqlMigration(BaseMigration):
+class SqlUpdater(BaseUpdater):
     """
 
     """
