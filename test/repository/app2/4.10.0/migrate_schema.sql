@@ -1,1 +1,1 @@
-ALTER TABLE testfirst ADD COLUMN INTEGER C;
+CREATE INDEX testfirst_idx ON testfirst (b);
