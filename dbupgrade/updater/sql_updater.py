@@ -110,5 +110,5 @@ class SqlUpdater(BaseUpdater):
         )
 
 
-class MigrationNotInitialized(Exception):
+class UpdaterNotInitialized(Exception):
     pass

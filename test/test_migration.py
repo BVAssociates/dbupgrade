@@ -1,5 +1,5 @@
 from dbupgrade.common import StepVersion, Migration
-from dbupgrade.migration.SqlMigration import SqlUpdater, BaseUpdater
+from dbupgrade.updater.sql_updater import SqlUpdater, BaseUpdater
 from dbupgrade.repository.file_repository import FileRepository
 
 __author__ = 'Vincent'
