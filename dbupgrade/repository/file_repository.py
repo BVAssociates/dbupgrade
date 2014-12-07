@@ -12,31 +12,31 @@ class FileRepository(object):
     Manage the file structure tree and get file contents
     """
 
-    def __init__(self, path, module):
+    def __init__(self, path, application):
         self.repository_path = path
 
-        self.module = module
+        self.application = application
 
         # a list of StepVersion objects
         self.versions = []
-        module_path = os.path.join(self.repository_path, self.module)
-        for version_string in os.listdir(module_path):
+        application_path = os.path.join(self.repository_path, self.application)
+        for version_string in os.listdir(application_path):
             current_version = StepVersion(version_string)
             self.versions.append(current_version)
 
         self.versions.sort()
 
     @staticmethod
-    def list_modules(repository_path):
+    def list_applications(repository_path):
         """
-        list of available modules in repository
+        list of available applications in repository
 
         :return list:
         """
-        modules = os.listdir(repository_path)
-        modules.sort()
+        applications = os.listdir(repository_path)
+        applications.sort()
 
-        return modules
+        return applications
 
     def list_versions(self):
         """
@@ -101,22 +101,23 @@ class FileRepository(object):
         if migration_steps[0] > migration_steps[-1]:
             pattern='^undo_'
 
-        result = Migration()
+        result = Migration(self.application)
         for step in migration_steps:
-            result[step] = self.read_file(step.version_string, pattern)
+            step.content = self.read_file(step.version_string, pattern)
+            result.append_step(step)
 
         return result
 
-    def read_file(self, module_version, pattern):
+    def read_file(self, application_version, pattern):
         """
         return the content of the specified file
 
-        :param module_version:
+        :param application_version:
         :param pattern:
         :return string:
         """
 
-        version_path = os.path.join(self.repository_path, self.module, module_version)
+        version_path = os.path.join(self.repository_path, self.application, application_version)
 
         found_files = []
         for step_file in os.listdir(version_path):
