@@ -1,1 +1,1 @@
-CREATE INDEX testfirst_idx ON testfirst (b);
+CREATE INDEX test_first_idx ON test_first (b);

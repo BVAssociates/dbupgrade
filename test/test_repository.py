@@ -96,9 +96,9 @@ class FileRepositoryCase(unittest.TestCase):
         steps = self.repo.get_migration(version_from=StepVersion('4.0.1'), version_to=StepVersion('4.10.0'))
         self.assertEquals(steps.content_steps(),
                           (
-                              'CREATE TABLE test_first (INTEGER a,VARCHAR b);',
-                              'CREATE TABLE test_second (INTEGER a,VARCHAR b);',
-                              'ALTER TABLE testfirst ADD COLUMN INTEGER C;',
+                              'CREATE TABLE test_first (a INTEGER, b VARCHAR);',
+                              'CREATE TABLE test_second (a INTEGER, b VARCHAR);',
+                              'CREATE INDEX test_first_idx ON test_first (b);',
                           )
         )
 
@@ -106,7 +106,7 @@ class FileRepositoryCase(unittest.TestCase):
         steps = self.repo.get_migration(version_from=StepVersion('4.10.0'), version_to=StepVersion('4.0.1'))
         self.assertEquals(steps.content_steps(),
                           (
-                              'ALTER TABLE testfirst DROP COLUMN C;',
+                              'DROP INDEX test_first_idx;',
                               'DROP TABLE test_second;',
                               'DROP TABLE test_first;',
                           )

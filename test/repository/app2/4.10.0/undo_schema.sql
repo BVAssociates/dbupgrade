@@ -1,1 +1,1 @@
-DROP INDEX testfirst_idx;
+DROP INDEX test_first_idx;

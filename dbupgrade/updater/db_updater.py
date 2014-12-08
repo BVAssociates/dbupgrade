@@ -21,13 +21,20 @@ class SqliteDBUpdater(SqlUpdater):
         self.cursor = self.conn.cursor()
 
     def end(self):
+        #print "commiting..."
         self.conn.commit()
 
     def run_sql_statement(self, request, params=()):
         try:
-            self.cursor.execute(request)
+            #print '==== BEGIN DUMP ===='
+            #for line in self.conn.iterdump():
+            #    print line
+            #print '==== END DUMP ===='
+            #print request
+
+            self.cursor.execute(request, params)
         except OperationalError as o:
-            raise OperationalError(o.message + request)
+            raise OperationalError(o.message + " : " + request)
 
         return self.cursor.rowcount
 
