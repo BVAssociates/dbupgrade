@@ -114,15 +114,15 @@ class SqliteDBUpdaterCase(unittest.TestCase):
         self.sqlupdater.run_migration()
 
         self.assertEqual(
-            "\n".join(self.sqlupdater.conn.iterdump()),
+            self.sqlupdater.schema_dump(),
             (
-                "BEGIN TRANSACTION;\n"
-
-                "CREATE TABLE dbupgrade_history (\n"
-                "   application  VARCHAR(90) NOT NULL,\n"
-                "   version VARCHAR(90) NOT NULL,\n"
-                "   timestamp DATE NOT NULL DEFAULT CURRENT_DATE\n"
-                ")\n"
+                'BEGIN TRANSACTION;\n'
+                'CREATE TABLE dbupgrade_history (\n'
+                '    application  VARCHAR(90) NOT NULL,\n'
+                '    version VARCHAR(90) NOT NULL,\n'
+                '    timestamp DATE NOT NULL DEFAULT CURRENT_DATE\n'
+                ');\n'
+                'COMMIT;\n'
             )
         )
 

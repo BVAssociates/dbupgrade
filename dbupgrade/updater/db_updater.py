@@ -26,18 +26,18 @@ class SqliteDBUpdater(SqlUpdater):
 
     def run_sql_statement(self, request, params=()):
         try:
-            #print '==== BEGIN DUMP ===='
-            #for line in self.conn.iterdump():
-            #    print line
-            #print '==== END DUMP ===='
             #print request
-
             self.cursor.execute(request, params)
         except OperationalError as o:
             raise OperationalError(o.message + " : " + request)
 
         return self.cursor.rowcount
 
-
+    def schema_dump(self):
+        dump_text = ''
+        for line in self.conn.iterdump():
+            if line.find('INSERT') != 0:
+                dump_text += line + "\n"
+        return dump_text
 
 
