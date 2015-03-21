@@ -1,1 +1,0 @@
-CREATE TABLE test_first (a INTEGER, b VARCHAR);
